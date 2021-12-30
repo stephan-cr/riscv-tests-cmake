@@ -1,10 +1,11 @@
-# CMakeLists.txt to build the RISCV tests
+# CMakeLists.txt to build the RISCV ISA tests
 # (https://github.com/riscv-software-src/riscv-tests)
 #
-# Currently, it only builds "ui", "um" and partially "uf". That means
-# it's not complete yet.
+# Currently, it only builds "ui", "um" and partially "uf" and
+# "ud". That means it's not complete yet.
 #
-# Place this file at the root directory of the above repository.
+# Place this file directly or as a symlink at the root directory of
+# the above repository.
 
 cmake_minimum_required(VERSION 3.22)
 
