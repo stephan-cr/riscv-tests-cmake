@@ -1,8 +1,21 @@
 # CMakeLists.txt to build the RISCV ISA tests
 # (https://github.com/riscv-software-src/riscv-tests)
 #
-# Currently, it only builds "ui", "um" and partially "uf" and
-# "ud". That means it's not complete yet.
+# Currently, it only builds:
+#
+# - "ui",
+# - "um",
+# - "ua",
+# - "uc"
+#
+# and partially:
+#
+# - "uf",
+# - "ud",
+# - "si" (Clang would fail),
+# - "mi" (Clang would fail).
+#
+# That means it's not complete yet.
 #
 # Place this file directly or as a symlink at the root directory of
 # the above repository.
@@ -34,14 +47,22 @@ macro(add_riscv_test target_name subset)
   target_link_options(${_target} PRIVATE "LINKER:-T,${_linker_script}")
   set_target_properties(${_target} PROPERTIES LINK_DEPENDS "${_linker_script}")
 
-  if(${subset} STREQUAL "uf" AND CMAKE_ASM_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(${_target} PUBLIC -march=rv${XLEN}if)
-  elseif(${subset} STREQUAL "ud" AND CMAKE_ASM_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(${_target} PUBLIC -march=rv${XLEN}ifd)
-  elseif(${subset} STREQUAL "um" AND CMAKE_ASM_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(${_target} PUBLIC -march=rv${XLEN}im)
-  elseif(${subset} STREQUAL "ui" AND CMAKE_ASM_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(${_target} PUBLIC -march=rv${XLEN}i)
+  if(CMAKE_ASM_COMPILER_ID MATCHES "Clang|GNU")
+    if(${subset} STREQUAL "uf")
+      target_compile_options(${_target} PUBLIC -march=rv${XLEN}if)
+    elseif(${subset} STREQUAL "ud")
+      target_compile_options(${_target} PUBLIC -march=rv${XLEN}ifd)
+    elseif(${subset} STREQUAL "um")
+      target_compile_options(${_target} PUBLIC -march=rv${XLEN}im)
+    elseif(${subset} STREQUAL "ui" OR ${subset} STREQUAL "si")
+      target_compile_options(${_target} PUBLIC -march=rv${XLEN}i)
+    elseif(${subset} STREQUAL "ua")
+      target_compile_options(${_target} PUBLIC -march=rv${XLEN}ia)
+    elseif(${subset} STREQUAL "uc")
+      target_compile_options(${_target} PUBLIC -march=rv${XLEN}ic)
+    elseif(${subset} STREQUAL "uzfh")
+      target_compile_options(${_target} PUBLIC -march=rv${XLEN}izh)
+    endif()
   endif()
 
   install(TARGETS ${_target}
@@ -135,3 +156,50 @@ endif()
 add_riscv_test(ldst "ud")
 # add_riscv_test(move "ud") # -> doesn't work yet, not really build in original source
 add_riscv_test(recoding "ud")
+
+add_riscv_test(amoadd_w "ua")
+add_riscv_test(amoand_w "ua")
+add_riscv_test(amomaxu_w "ua")
+add_riscv_test(amomax_w "ua")
+add_riscv_test(amominu_w "ua")
+add_riscv_test(amomin_w "ua")
+add_riscv_test(amoor_w "ua")
+add_riscv_test(amoswap_w "ua")
+add_riscv_test(amoxor_w "ua")
+add_riscv_test(lrsc "ua")
+
+add_riscv_test(rvc "uc")
+
+if(NOT CMAKE_ASM_COMPILER_ID STREQUAL "Clang")
+  # s-mode tests
+  add_riscv_test(csr "si")
+  add_riscv_test(dirty "si")
+  add_riscv_test(ma_fetch "si")
+  add_riscv_test(sbreak "si")
+  add_riscv_test(scall "si")
+  add_riscv_test(wfi "si")
+
+  # m-mode tests
+  add_riscv_test(breakpoint "mi")
+  add_riscv_test(csr "mi")
+  add_riscv_test(illegal "mi")
+  add_riscv_test(ma_addr "mi")
+  add_riscv_test(ma_fetch "mi")
+  add_riscv_test(mcsr "mi")
+  add_riscv_test(sbreak "mi")
+  add_riscv_test(scall "mi")
+  add_riscv_test(shamt "mi")
+endif()
+
+# doesn't work yet
+# add_riscv_test(fadd "uzfh")
+# add_riscv_test(fclass "uzfh")
+# add_riscv_test(fcmp "uzfh")
+# add_riscv_test(fcvt "uzfh")
+# add_riscv_test(fcvt_w "uzfh")
+# add_riscv_test(fdiv "uzfh")
+# add_riscv_test(fmadd "uzfh")
+# add_riscv_test(fmin "uzfh")
+# add_riscv_test(ldst "uzfh")
+# add_riscv_test(move "uzfh")
+# add_riscv_test(recoding "uzfh")
