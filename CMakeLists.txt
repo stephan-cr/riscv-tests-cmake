@@ -61,7 +61,7 @@ macro(add_riscv_test target_name subset)
     elseif(${subset} STREQUAL "uc")
       target_compile_options(${_target} PUBLIC -march=rv${XLEN}ic)
     elseif(${subset} STREQUAL "uzfh")
-      target_compile_options(${_target} PUBLIC -march=rv${XLEN}izh)
+      target_compile_options(${_target} PUBLIC -march=rv${XLEN}i_zfh)
     endif()
   endif()
 
@@ -191,7 +191,8 @@ if(NOT CMAKE_ASM_COMPILER_ID STREQUAL "Clang")
   add_riscv_test(shamt "mi")
 endif()
 
-# doesn't work yet
+# half-precision floating-point tests
+# doesn't work yet, not well supported by stock GCC and Clang
 # add_riscv_test(fadd "uzfh")
 # add_riscv_test(fclass "uzfh")
 # add_riscv_test(fcmp "uzfh")
