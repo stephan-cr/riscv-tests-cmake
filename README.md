@@ -39,9 +39,8 @@ CMake parameters
 ----------------------
 
 The test binaries might be "installed" in a separate directory. To
-choose a directory, like `$HOME/riscv-tests`, run the initial CMake
-command like:
+install them in a directory, like `$HOME/riscv-tests`, run CMake like:
 
 ```shell
-cmake -S . -B build --toolchain=../riscv-tests-cmake/toolchains/clang-rv32i-toolchain.cmake -DCMAKE_INSTALL_PREFIX=$HOME/riscv-tests
+cmake --install build --prefix $HOME/riscv-tests
 ```
