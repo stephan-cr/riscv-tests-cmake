@@ -179,7 +179,15 @@ if(NOT CMAKE_ASM_COMPILER_ID STREQUAL "Clang")
   add_riscv_test(scall "si")
   add_riscv_test(wfi "si")
 
+  if(XLEN EQUAL 64)
+    add_riscv_test(icache-alias "si")
+  endif()
+
   # m-mode tests
+  if(XLEN EQUAL 64)
+    add_riscv_test(access "mi")
+  endif()
+
   add_riscv_test(breakpoint "mi")
   add_riscv_test(csr "mi")
   add_riscv_test(illegal "mi")
@@ -189,6 +197,12 @@ if(NOT CMAKE_ASM_COMPILER_ID STREQUAL "Clang")
   add_riscv_test(sbreak "mi")
   add_riscv_test(scall "mi")
   add_riscv_test(shamt "mi")
+
+  add_riscv_test(lh-misaligned "mi")
+  add_riscv_test(lw-misaligned "mi")
+  add_riscv_test(sh-misaligned "mi")
+  add_riscv_test(sw-misaligned "mi")
+  add_riscv_test(zicntr "mi")
 endif()
 
 # half-precision floating-point tests
