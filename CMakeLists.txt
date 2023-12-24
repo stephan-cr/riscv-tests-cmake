@@ -22,7 +22,7 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-project(riscv-tests LANGUAGES ASM)
+project(riscv-tests LANGUAGES ASM C)
 
 set(XLEN "32" CACHE STRING "32 or 64 bit")
 if(NOT XLEN MATCHES "^(32|64)$")
@@ -47,6 +47,9 @@ macro(add_riscv_test target_name subset)
   target_link_options(${_target} PRIVATE "LINKER:-T,${_linker_script}")
   set_target_properties(${_target} PROPERTIES
     LINK_DEPENDS "${_linker_script}")
+  if(TEST_ENV STREQUAL "v")
+    target_link_libraries(${_target} PRIVATE env)
+  endif()
 
   if(CMAKE_ASM_COMPILER_ID MATCHES "Clang|GNU")
     if(${subset} STREQUAL "uf")
@@ -92,6 +95,19 @@ macro(add_riscv_test target_name subset)
   unset(_linker_script)
   unset(_target)
 endmacro()
+
+if(TEST_ENV STREQUAL "v")
+  add_library(env STATIC
+    ${CMAKE_SOURCE_DIR}/env/${TEST_ENV}/entry.S
+    ${CMAKE_SOURCE_DIR}/env/${TEST_ENV}/string.c
+    ${CMAKE_SOURCE_DIR}/env/${TEST_ENV}/vm.c)
+  target_compile_definitions(env PRIVATE ENTROPY=0x0)
+  if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(env PRIVATE -march=rv${XLEN}ifzicsr_zifencei)
+  else()
+    target_compile_options(env PRIVATE -march=rv${XLEN}if)
+  endif()
+endif()
 
 add_riscv_test(addi "ui")
 add_riscv_test(add "ui")
